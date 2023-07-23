@@ -1,0 +1,7 @@
+train: dataset/train/images
+val: dataset/valid/images
+test: dataset/test/images
+
+nc: 47
+names: ['A', 'AA', 'BA', 'BHA', 'BISHARGA', 'CA', 'Cha', 'DA', 'DDA', 'E', 'EIGHT', 'FIVE', 'FOUR', 'GA', 'GHA', 'HA', 'I', 'JA', 'JHA', 'KA', 'Kha', 'LA', 'MA', 'NA', 'NG', 'NINE', 'O', 'ONE', 'PA', 'PHA', 'RA', 'RRA', 'SEVEN', 'SHA', 'SIX', 'Signs', 'THA', 'THREE', 'TWO', 'U', 'YA', 'ZERRO', 'ddha', 'dha', 'ta', 'tta', 'ttha']
+
