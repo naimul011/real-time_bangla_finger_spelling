@@ -2,7 +2,7 @@
 [View Project in Roboflow](https://app.roboflow.com/manarat-international-university/bangla-sign-language-detection-system-using-yolov5/overview)
 ## Project Description:
 The Real-Time Bangla Digit and Alphabet Detection project aims to develop an advanced computer vision system capable of accurately detecting digits and alphabets in Bangla sign language. Leveraging the power of YOLOv5, a state-of-the-art object detection algorithm, this project will enable real-time recognition of Bangla sign language gestures for digits and alphabets. The system's ultimate goal is to utilize these real-time detections to spell out words, enhancing communication and facilitating meaningful interactions for individuals with hearing and speech impairments. <br>
-![Alt text](My_Movie_3_AdobeExpress.gif)
+![Alt text](realtime.gif)
 ## Objective:
 The primary objective of this project is to create a highly accurate and efficient computer vision model that can recognize and interpret Bangla sign language gestures for digits and alphabets in real-time. By leveraging YOLOv5's capabilities, the system aims to empower individuals with hearing and speech impairments, enabling them to communicate and spell out words using sign language effectively.
 
