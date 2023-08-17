@@ -38,6 +38,12 @@ from collections import defaultdict
 from pathlib import Path
 
 import torch
+import json
+
+# Dictionary to be saved
+#my_dict = {'key1': 'value1', 'key2': 'value2'}
+
+
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
@@ -96,6 +102,7 @@ def run(
     # Dictionary to store frequency count for each class
     #class_frequency = defaultdict(lambda: {"count": 0, "timestamps": []})
     class_frequency = {}
+    word = []
 
     # Directories
     save_dir = increment_path(Path(project) / name, exist_ok=exist_ok)  # increment run
@@ -178,6 +185,12 @@ def run(
                     
                     for class_name, frequency in class_frequency.items():
                         print(f"{class_name}: {frequency} detections")
+                        if frequency > 20 and class_name not in word:
+                           word.append(class_name)
+                    
+                    print("word = ", word)
+                    
+                    
 
 
 
