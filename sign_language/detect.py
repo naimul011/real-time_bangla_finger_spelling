@@ -106,6 +106,7 @@ def run(
     class_frequency = {}
     word = []
     class_detected = False
+    compound_detected = False
     compund_characters = {
     'KA': {
         'ka': 'kka',
@@ -209,6 +210,7 @@ def run(
                            word.append(class_name)
                            class_detected = True
                            if word[-1] == 'TWO' and len(word) >= 3:
+                               compound_detected = True
                                word.pop()
                                b = word.pop()
                                a = word.pop()
@@ -216,11 +218,11 @@ def run(
                                class_frequency['TWO'] = 0
                                class_frequency[a] = 0
                                class_frequency[b] = 0
-                        
-                            
 
 
-                               
+
+
+                                
 
                     
                     print("word = ", word)
@@ -244,6 +246,10 @@ def run(
                             annotator.box_label(xyxy, label+str(" :Detected"), color=colors(c, True))
 
                             class_detected = False
+                        elif compound_detected :
+                            annotator.box_label(xyxy, label+str(" :Detected( = ")+str(word[-1])+str(")"), color=colors(c, True))
+
+                            compound_detected = False
                         else:
                             annotator.box_label(xyxy, label, color=colors(c, True))
 
