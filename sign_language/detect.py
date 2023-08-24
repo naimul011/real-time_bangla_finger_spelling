@@ -228,7 +228,7 @@ def run(
                     print("word = ", word)
                     
                     
-# my name is tariq bin bashar
+
 
 
                 # Write results
