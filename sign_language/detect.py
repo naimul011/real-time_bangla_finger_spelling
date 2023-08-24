@@ -38,6 +38,14 @@ from collections import defaultdict
 from pathlib import Path
 
 import torch
+import json
+
+# Dictionary to be saved
+#my_dict = {'key1': 'value1', 'key2': 'value2'}
+
+
+
+
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
@@ -96,6 +104,26 @@ def run(
     # Dictionary to store frequency count for each class
     #class_frequency = defaultdict(lambda: {"count": 0, "timestamps": []})
     class_frequency = {}
+    word = []
+    class_detected = False
+    compound_detected = False
+    compund_characters = {
+    'KA': {
+        'ka': 'kka',
+        'ba': 'kba',
+        'tta': 'kta',
+        'ma': 'kma',
+        'la': 'kla',
+    },
+    'ga': {
+        'dha': 'gdha',
+        'na': 'gna',
+        'ba': 'gba',
+        'ma': 'gma',
+        'la': 'gla'
+    }
+}
+
 
     # Directories
     save_dir = increment_path(Path(project) / name, exist_ok=exist_ok)  # increment run
@@ -178,6 +206,28 @@ def run(
                     
                     for class_name, frequency in class_frequency.items():
                         print(f"{class_name}: {frequency} detections")
+                        if frequency > 20 and class_name not in word:
+                           word.append(class_name)
+                           class_detected = True
+                           if word[-1] == 'TWO' and len(word) >= 3:
+                               compound_detected = True
+                               word.pop()
+                               b = word.pop()
+                               a = word.pop()
+                               word.append(compund_characters[a][b])
+                               class_frequency['TWO'] = 0
+                               class_frequency[a] = 0
+                               class_frequency[b] = 0
+
+
+
+
+                                
+
+                    
+                    print("word = ", word)
+                    
+                    
 
 
 
@@ -192,7 +242,19 @@ def run(
                     if save_img or save_crop or view_img:  # Add bbox to image
                         c = int(cls)  # integer class
                         label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
-                        annotator.box_label(xyxy, label, color=colors(c, True))
+                        if class_detected:
+                            annotator.box_label(xyxy, label+str(" :Detected"), color=colors(c, True))
+
+                            class_detected = False
+                        elif compound_detected :
+                            annotator.box_label(xyxy, label+str(" :Detected( = ")+str(word[-1])+str(")"), color=colors(c, True))
+
+                            compound_detected = False
+                        else:
+                            annotator.box_label(xyxy, label, color=colors(c, True))
+
+
+                        
                     if save_crop:
                         save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
 
@@ -224,6 +286,7 @@ def run(
                         save_path = str(Path(save_path).with_suffix('.mp4'))  # force *.mp4 suffix on results videos
                         vid_writer[i] = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
                     vid_writer[i].write(im0)
+                    
 
         # Print time (inference-only)
         LOGGER.info(f"{s}{'' if len(det) else '(no detections), '}{dt[1].dt * 1E3:.1f}ms")
