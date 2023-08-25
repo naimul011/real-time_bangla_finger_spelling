@@ -107,13 +107,32 @@ def run(
     word = []
     class_detected = False
     compound_detected = False
+    vowel_detected = False
+    
+    independent_vowels= {
+        'aa': 'AA',
+        'i' : 'I',
+        'ii' : 'II',
+        'u' : 'U',
+        'uu' : 'UU',
+        'r' : 'R',
+        'e' : 'E',
+        'ai' : 'AI',
+        'o' : 'O',
+        'au' : 'AU'
+     }
     compund_characters = {
-    'KA': {
+    'ka': {
         'ka': 'kka',
         'ba': 'kba',
         'tta': 'kta',
         'ma': 'kma',
         'la': 'kla',
+        'ta': 'kta',
+        'ssa': 'ksa',
+        'ssa': {
+            'ma' : 'ksma'
+        }
     },
     'ga': {
         'dha': 'gdha',
@@ -121,11 +140,114 @@ def run(
         'ba': 'gba',
         'ma': 'gma',
         'la': 'gla'
-    }
+    },
+
+     'Gha': {
+        'na': 'ghna'
+
+    },
+
+
+    'nga': {
+        'ka': 'nka',
+        'tha': 'ntha',
+        'ga': 'nga',
+        'gha': 'ngha',
+        'ma': 'nma'
+
+    },
+    'ca': {
+        'cha': 'ccha',
+        'nya': 'cna',
+       
+    },
+
+    'ja': {
+        'ja': 'jja',
+        'jha': 'jjha',
+        'nya': 'jna',
+        'ba': 'jba',
+    },
+
+    'nya': {
+        'ca': 'nca',
+        'cha': 'ncha',
+        'jha': 'njha',
+    },
+    'tta': {
+        'tta': 'tta',
+        'ba': 'tba',
+        'na': 'nta',
+
+    },
+
+    'nna': {
+        'ttha': 'ntha',
+        'dda': 'nda',
+        'na': 'nna',
+        'ma': 'nma',
+        'tta': 'nta'
+    },
+
+    'ta': {
+        'ta': 'tta',
+    },
+
+
+
+
 }
+    conversion = {
+    'A' : 'a',  
+    'BISHARGA' : 'bisharga',
+    'NG': 'ng',
+    'ZERRO': 'zerro',
+    'ONE': 'one',
+    'TWO': 'two',
+    'THREE': 'three',
+    'FOUR': 'four',
+    'FIVE': 'five',
+    'SIX': 'six',
+    'SEVEN': 'seven',
+    'EIGHT': 'eight',
+    'NINE': 'nine', 
+    'AA': 'aa',
+    'E': 'e',
+    'I': 'i',
+    'U': 'u',
+    'O': 'o',
+    'KA': 'ka',
+    'Kha': 'kha',
+    'GA': 'ga',
+    'GHA': 'gha',
+    'CA':  'ca',
+    'Cha': 'cha',
+    'JA': 'ja',
+    'JHA': 'jha',
+    'tta': 'tta',
+    'ttha': 'ttha',
+    'DDA': 'dda',
+    'RRA': 'rra',
+    'ddha': 'ddha',
+    'ta': 'ta',
+    'THA': 'tha',
+    'DA': 'da',
+    'dha': 'dha',
+    'NA': 'na',
+    'PA': 'pa',
+    'PHA': 'pha',
+    'BA': 'ba',
+    'BHA': 'bha',
+    'M': 'ma',
+    'YA': 'ya',
+    'RA': 'ra',
+    'L': 'la',
+    'SHA': 'sha',
+    'HA': 'ha'
+    }
 
 
-    # Directories
+
     save_dir = increment_path(Path(project) / name, exist_ok=exist_ok)  # increment run
     (save_dir / 'labels' if save_txt else save_dir).mkdir(parents=True, exist_ok=True)  # make dir
 
@@ -194,6 +316,8 @@ def run(
                 for c in det[:, 5].unique():
                     n = (det[:, 5] == c).sum()  # detections per class
                     class_name = names[int(c)]
+
+                    class_name = conversion[class_name]
                     s += f"{n} {class_name}{'s' * (n > 1)}, "  # add to string
                     
                     #print('debug!!!',class_name,' ', n)
@@ -209,22 +333,25 @@ def run(
                         if frequency > 20 and class_name not in word:
                            word.append(class_name)
                            class_detected = True
-                           if word[-1] == 'TWO' and len(word) >= 3:
+                           if word[-1] == 'two' and len(word) >= 3:
                                compound_detected = True
                                word.pop()
                                b = word.pop()
                                a = word.pop()
                                word.append(compund_characters[a][b])
-                               class_frequency['TWO'] = 0
-                               class_frequency[a] = 0
-                               class_frequency[b] = 0
+                               
+
+                           elif word[-1] == 'one' and len(word) > 1:
+                               vowel_detected = True
+                               word.pop()
+                               a = word.pop()
+                               word.append(independent_vowels[a])
+                               
+                           class_frequency = {k:0 for (k,v) in class_frequency.items()}
 
 
 
 
-                                
-
-                    
                     print("word = ", word)
                     
                     
@@ -243,13 +370,14 @@ def run(
                         c = int(cls)  # integer class
                         label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
                         if class_detected:
-                            annotator.box_label(xyxy, label+str(" :Detected"), color=colors(c, True))
-
-                            class_detected = False
-                        elif compound_detected :
                             annotator.box_label(xyxy, label+str(" :Detected( = ")+str(word[-1])+str(")"), color=colors(c, True))
 
-                            compound_detected = False
+                            class_detected = False
+                        elif compound_detected or vowel_detected:
+                            annotator.box_label(xyxy, label+str(" :Detected( = ")+str(word[-1])+str(")"), color=colors(c, True))
+
+                            compound_detected = vowel_detected = False
+
                         else:
                             annotator.box_label(xyxy, label, color=colors(c, True))
 
