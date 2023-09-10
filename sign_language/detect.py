@@ -327,13 +327,13 @@ def run(
                     print(f" debug!! {class_name}: {n} ")
                     # Update frequency count for each class
                     if class_name in class_frequency:
-                        class_frequency[class_name] += n
+                        class_frequency[class_name] += class_confidence
                     else:
-                        class_frequency[class_name] = n
+                        class_frequency[class_name] = class_confidence
                     
                     for class_name, frequency in class_frequency.items():
                         print(f"{class_name}: {frequency} detections")
-                        if frequency > 50 :
+                        if frequency > 10 :
                            word.append((class_name,time.time()-start))
                            class_detected = True
                            if word[-1] == 'two' and len(word) >= 3:
