@@ -36,7 +36,7 @@ import sys
 import time
 from collections import defaultdict
 from pathlib import Path
-
+import time
 import torch
 import json
 
@@ -238,15 +238,15 @@ def run(
     'PHA': 'pha',
     'BA': 'ba',
     'BHA': 'bha',
-    'M': 'ma',
+    'MA': 'ma',
     'YA': 'ya',
     'RA': 'ra',
-    'L': 'la',
+    'LA': 'la',
     'SHA': 'sha',
     'HA': 'ha'
     }
 
-
+    start = time.time()
 
     save_dir = increment_path(Path(project) / name, exist_ok=exist_ok)  # increment run
     (save_dir / 'labels' if save_txt else save_dir).mkdir(parents=True, exist_ok=True)  # make dir
@@ -314,7 +314,10 @@ def run(
 
                 # Print results
                 for c in det[:, 5].unique():
+                    class_confidence = det[det[:, 5] == c][:, 4].mean()  # Confidence for this class
+
                     n = (det[:, 5] == c).sum()  # detections per class
+
                     class_name = names[int(c)]
 
                     class_name = conversion[class_name]
@@ -324,14 +327,14 @@ def run(
                     print(f" debug!! {class_name}: {n} ")
                     # Update frequency count for each class
                     if class_name in class_frequency:
-                        class_frequency[class_name] += n
+                        class_frequency[class_name] += class_confidence
                     else:
-                        class_frequency[class_name] = n
+                        class_frequency[class_name] = class_confidence
                     
                     for class_name, frequency in class_frequency.items():
                         print(f"{class_name}: {frequency} detections")
-                        if frequency > 20 and class_name not in word:
-                           word.append(class_name)
+                        if frequency > 10 :
+                           word.append((class_name,time.time()-start))
                            class_detected = True
                            if word[-1] == 'two' and len(word) >= 3:
                                compound_detected = True
@@ -346,7 +349,8 @@ def run(
                                word.pop()
                                a = word.pop()
                                word.append(independent_vowels[a])
-                               
+
+                           start = time.time()  
                            class_frequency = {k:0 for (k,v) in class_frequency.items()}
 
 
